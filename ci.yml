@@ -6,6 +6,7 @@ on:
   pull_request:
 
 # Jobs
+# con una misma tuberia se pueden ejecutar varios jobs, pero en este caso solo tenemos uno
 jobs:
   test:
     runs-on: ubuntu-latest
