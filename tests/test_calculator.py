@@ -6,4 +6,4 @@ def test_sum() -> None:
 
 # Introducir un fallo premeditado
 def test_subtract() -> None:
-    assert subtract(5, 3) == 1
+    assert subtract(5, 3) == 2
