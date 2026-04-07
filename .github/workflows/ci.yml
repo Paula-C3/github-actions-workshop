@@ -1,8 +1,12 @@
-name: Mi primer CI
+name: CICD
 
 #Trigers
 on:
   push:
+    branches:
+      - main    # solo cuando se haga un push en main se va a ejecutar el workflow
+    tags:
+      - 'v*'    # también se ejecutará el workflow cuando se haga un push con una etiqueta que comience con "v"
   pull_request:
 
 # Jobs
@@ -47,7 +51,8 @@ jobs:
       run: pytest tests/
 
 
-  build:
+  docker-build:
+  # construye la imagen de docker, este job depende del job de test, es decir, se ejecutará solo si el job de test se ejecuta correctamente
     runs-on: ubuntu-latest
     needs: test
 
@@ -55,4 +60,40 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
     - name: Build docker image
-      run: docker build -t my-first-github-actions-wf .
+      run: docker build -t github-actions-workshop:latest .
+
+  docker-push:
+  # este job se ejecutará solo si el job de docker-build se ejecuta correctamente
+    runs-on: ubuntu-latest
+    needs: docker-build
+
+    if: github.event_name == 'push'
+
+    permissions:
+      contents: read    # es importante para no borrar nada, solo para leer el repositorio
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+    - name: Log in Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Extract Docker metadata
+      uses: docker/metadata-action@v5
+      with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-workshop
+          tags: |
+            type:raw, value=latest, enable={{is_default_branch}}
+            type:ref, event=branch
+            type:ref, event=tag
+            type:sha
+    - name: Build & push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        platform: linux/amd64
+        tags: ${{ steps.metadata.outputs.tags }}
+        labels: ${{ steps.metadata.outputs.labels }}
