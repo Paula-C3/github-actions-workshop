@@ -85,7 +85,7 @@ jobs:
       with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-workshop
           tags: |
-            type:raw, value=latest, enable={{is_default_branch}}
+            type:raw, value=latest
             type:ref, event=branch
             type:ref, event=tag
             type:sha
@@ -94,6 +94,6 @@ jobs:
       with:
         context: .
         push: true
-        platform: linux/amd64
+        platforms: linux/amd64
         tags: ${{ steps.metadata.outputs.tags }}
         labels: ${{ steps.metadata.outputs.labels }}
