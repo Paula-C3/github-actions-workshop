@@ -60,7 +60,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v6
     - name: Build docker image
-      run: docker build -t github-actions-workshop:latest .
+      run: docker build -t github-actions-workshop:dev .
 
   docker-push:
   # este job se ejecutará solo si el job de docker-build se ejecuta correctamente
@@ -86,8 +86,8 @@ jobs:
       with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-workshop
           tags: |
-            type:raw, value=dev
-            type:ref, event=tag
+            type=raw,value=dev
+            type:ref,event=tag
             type:sha
     - name: Print generated tags
       run: echo "Generated tags  ${{ steps.metadata.outputs.tags }}"
