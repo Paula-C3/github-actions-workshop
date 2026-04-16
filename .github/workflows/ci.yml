@@ -4,7 +4,7 @@ name: CICD
 on:
   push:
     branches:
-      - main    # solo cuando se haga un push en main se va a ejecutar el workflow
+      - dev    # solo cuando se haga un push en main se va a ejecutar el workflow
     tags:
       - 'v*'    # también se ejecutará el workflow cuando se haga un push con una etiqueta que comience con "v"
   pull_request:
